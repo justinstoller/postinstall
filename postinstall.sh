@@ -65,9 +65,11 @@ install_ruby_build() {
 install_chruby() {
   pushd /opt/src
     wget -O chruby-0.3.4.tar.gz https://github.com/postmodern/chruby/archive/v0.3.4.tar.gz
-    tar -xzvf chruby-0.3.4.tar.gz
+    tar -xzf chruby-0.3.4.tar.gz
     pushd chruby-0.3.4
       make install
+      ln -s /usr/local/share/chruby/chruby.sh /etc/profile.d/chruby.sh
+      source /etc/profile.d/chruby.sh
     popd
   popd
 }
@@ -92,10 +94,10 @@ clear_free_space() {
 
 date > /etc/vagrant_build
 
-INSTALL_PACKAGES=(linux-headers-$(uname -r) build-essential install \
+INSTALL_PACKAGES=(linux-headers-$(uname -r) build-essential \
                   zlib1g-dev libssl-dev libreadline6-dev libnurses5-dev \
                   curl bison automake autoconf git-core libc6-dev libtool \
-                  libyaml-dev openssl pkg-config libsqlite3-dev vim nfs-common)
+                  libyaml-dev openssl pkg-config libsqlite3-dev vim)
 
 apt-get -y update
 apt-get -y upgrade
@@ -113,6 +115,8 @@ install_ruby_build
 install_chruby
 
 ruby-build 1.9.3-p392 /opt/rubies/1.9.3-p392
+ruby-build 2.0.0-p0 /opt/rubies/2.0.0-p0
+ruby-build 1.8.7-p371 /opt/rubies/1.8.7-p371
 
 for VUSER in root vagrant
 do
