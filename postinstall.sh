@@ -103,11 +103,11 @@ install_chruby() {
 # http://6.ptmc.org/?p=164
 # Adding a 2 sec delay to the interface up, to make the dhclient happy
 setup_network_settings() {
-  rm /var/lib/dhcp3/*
-  rm /etc/udev/rules.d/70-persistent-net.rules
-  mkdir /etc/udev/rules.d/70-persistent-net.rules
+  rm -rf /var/lib/dhcp3/*
+  rm -rf /etc/udev/rules.d/70-persistent-net.rules
+  mkdir -p /etc/udev/rules.d/70-persistent-net.rules
   rm -rf /dev/.udev/
-  rm /lib/udev/rules.d/75-persistent-net-generator.rules
+  rm -rf /lib/udev/rules.d/75-persistent-net-generator.rules
   echo "pre-up sleep 2" >> /etc/network/interfaces
 }
 
