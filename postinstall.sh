@@ -29,13 +29,18 @@
 #  rm -rf $ruby
 #}
 
-# Installing vagrant keys
-# usage: install_vagrant_key_for vagrant
-install_vagrant_key_for() {
-  pushd "/home/$1"
+home_dir_for() {
+  if [[ $1 == root ]]; then
+    return "/root";
+  else
+    return "/home/$1";
+  fi
+}
+setup_ssh_for() {
+  pushd `home_dir_for $1`
     mkdir -p .ssh
     pushd .ssh
-      wget --no-check-certificate 'https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub' -O authorized_keys
+      touch authorized_keys
       chmod 600 authorized_keys
     popd
     chown -R $1 .ssh
@@ -43,9 +48,29 @@ install_vagrant_key_for() {
   popd
 }
 
+# Installing vagrant keys
+# usage: install_vagrant_key_for vagrant
+install_vagrant_key_for() {
+  pushd "`home_dir_for $1`/.ssh"
+    touch authorized_keys
+    wget --no-check-certificate 'https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub'
+    cat vagrant.pub >> authorized_keys
+  popd
+}
+
+install_puppetlabs_keys_for() {
+  pushd "`home_dir_for $1`/.ssh"
+    touch authorized_keys
+    wget --no-check-certificat -O 'puppetlabs.pub' 'https://raw.github.com/puppetlabs/puppetlabs-sshkeys/master/templates/ssh/authorized_keys'
+    cat puppetlabs.pub >> authorized_keys
+  popd
+}
+
 # usage create_admin_user vagrant
 create_admin_user() {
-  useradd $1
+  if ! [[ $1 == root ]]; then
+    useradd $1
+  fi
   usermod -a -G admin $1
   # Setup sudo to allow no-password sudo for "admin"
   cp /etc/sudoers /etc/sudoers.orig
@@ -118,9 +143,11 @@ ruby-build 1.9.3-p392 /opt/rubies/1.9.3-p392
 ruby-build 2.0.0-p0 /opt/rubies/2.0.0-p0
 ruby-build 1.8.7-p371 /opt/rubies/1.8.7-p371
 
-for VUSER in root vagrant
+for vUSER in root vagrant
 do
-  install_vagrant_key_for $VUSER
+  setup_ssh_for $vUSER
+  install_vagrant_key_for $vUSER
+  install_puppetlabs_keys_for $vUSER
 done
 
 clear_free_space
