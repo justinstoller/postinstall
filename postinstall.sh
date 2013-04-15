@@ -31,9 +31,9 @@
 
 home_dir_for() {
   if [[ $1 == root ]]; then
-    return "/root";
+    echo "/root";
   else
-    return "/home/$1";
+    echo "/home/$1";
   fi
 }
 setup_ssh_for() {
@@ -119,14 +119,14 @@ clear_free_space() {
 
 date > /etc/vagrant_build
 
-INSTALL_PACKAGES=(linux-headers-$(uname -r) build-essential \
+INSTALL_PACKAGES=(linux-headers-`uname -r` build-essential \
                   zlib1g-dev libssl-dev libreadline6-dev libnurses5-dev \
                   curl bison automake autoconf git-core libc6-dev libtool \
                   libyaml-dev openssl pkg-config libsqlite3-dev vim)
 
 apt-get -y update
 apt-get -y upgrade
-apt-get -y install $INSTALL_PACKAGES
+apt-get -y install ${INSTALL_PACKAGES[@]}
 apt-get clean
 
 groupadd -r admin
